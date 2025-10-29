@@ -62,38 +62,48 @@ class CartController extends \frontend\base\Controller
 
     public function actionAdd()
     {
-        $id = \Yii::$app->request->post('id');
+        $id = Yii::$app->request->post('id');
         $product = Product::find()->id($id)->published()->one();
         if (!$product) {
             throw new NotFoundHttpException("Product does not exist");
         }
 
-        if (\Yii::$app->user->isGuest) {
+        if (Yii::$app->user->isGuest) {
+            // Debug: Log session before modification
+            Yii::info('Before adding to cart - Session items: ' . json_encode(Yii::$app->session->get(CartItem::SESSION_KEY, [])), 'cart-debug');
 
-            $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
+            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
             $found = false;
             foreach ($cartItems as &$item) {
                 if ($item['id'] == $id) {
                     $item['quantity']++;
+                    $item['total_price'] = $item['quantity'] * $item['price'];
                     $found = true;
                     break;
                 }
             }
             if (!$found) {
                 $cartItem = [
-                    'id' => $id,
+                    'id' => (int)$id,
                     'name' => $product->name,
                     'image' => $product->image,
-                    'price' => $product->price,
+                    'price' => (float)$product->price,
                     'quantity' => 1,
-                    'total_price' => $product->price
+                    'total_price' => (float)$product->price
                 ];
                 $cartItems[] = $cartItem;
             }
 
-            \Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
+            Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
+            
+            // Debug: Log session after modification
+            Yii::info('After adding to cart - Session items: ' . json_encode(Yii::$app->session->get(CartItem::SESSION_KEY, [])), 'cart-debug');
+            
+            return [
+                'success' => true
+            ];
         } else {
-            $userId = \Yii::$app->user->id;
+            $userId = Yii::$app->user->id;
             $cartItem = CartItem::find()->userId($userId)->productId($id)->one();
             if ($cartItem) {
                 $cartItem->quantity++;
@@ -110,7 +120,7 @@ class CartController extends \frontend\base\Controller
             } else {
                 return [
                     'success' => false,
-                    'errors' => $cartItem->errors
+                    'errors' => $cartItem->getErrors()
                 ];
             }
         }
@@ -145,8 +155,9 @@ class CartController extends \frontend\base\Controller
         if (isGuest()) {
             $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
             foreach ($cartItems as &$cartItem) {
-                if ($cartItem['id'] === $id) {
+                if ($cartItem['id'] == $id) {
                     $cartItem['quantity'] = $quantity;
+                    $cartItem['total_price'] = $cartItem['quantity'] * $cartItem['price'];
                     break;
                 }
             }
@@ -277,5 +288,23 @@ class CartController extends \frontend\base\Controller
         throw new BadRequestHttpException();
 
         // todo Validate the transaction ID. It must not be used and it must be valid transaction ID in paypal.
+    }
+
+    public function actionTest()
+    {
+        // Test session
+        $testData = ['test' => 'value', 'time' => time()];
+        \Yii::$app->session->set('test_key', $testData);
+        
+        $retrieved = \Yii::$app->session->get('test_key');
+        
+        return [
+            'session_works' => $retrieved === $testData,
+            'session_id' => session_id(),
+            'user_is_guest' => \Yii::$app->user->isGuest,
+            'current_cart' => \Yii::$app->session->get(CartItem::SESSION_KEY, []),
+            'test_data_set' => $testData,
+            'test_data_retrieved' => $retrieved
+        ];
     }
 }

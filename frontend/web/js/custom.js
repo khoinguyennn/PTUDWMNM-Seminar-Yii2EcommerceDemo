@@ -1,31 +1,70 @@
 $(document).ready(function() {
     
-    // Add to Cart Animation
-    $('.btn-add-to-cart').click(function(e) {
+    // Add to Cart Animation - Use event delegation to prevent double binding
+    $(document).off('click', '.btn-add-to-cart').on('click', '.btn-add-to-cart', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         
         var $btn = $(this);
+        
+        // Prevent double execution
+        if ($btn.hasClass('loading') || $btn.hasClass('processing')) {
+            return false;
+        }
+        
         var originalText = $btn.html();
         
-        // Add loading state
-        $btn.addClass('loading').html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+        // Add loading and processing state
+        $btn.addClass('loading processing').html('<i class="fas fa-spinner fa-spin"></i> Adding...');
         
         var productId = $btn.data('id');
         var url = $btn.data('url');
         
-        // Simulate API call (replace with actual AJAX)
-        setTimeout(function() {
-            $btn.removeClass('loading').html('<i class="fas fa-check"></i> Added!').addClass('btn-success').removeClass('btn-primary');
-            
-            // Update cart count
-            var currentCount = parseInt($('#cart-quantity').text()) || 0;
-            $('#cart-quantity').text(currentCount + 1);
-            
-            // Reset button after 2 seconds
-            setTimeout(function() {
-                $btn.html(originalText).removeClass('btn-success').addClass('btn-primary');
-            }, 2000);
-        }, 1000);
+        // AJAX call to add product to cart
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                id: productId,
+                _csrf: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    $btn.removeClass('loading').html('<i class="fas fa-check"></i> Added!').addClass('btn-success').removeClass('btn-primary');
+                    
+                    // Update cart count
+                    var currentCount = parseInt($('#cart-quantity').text()) || 0;
+                    $('#cart-quantity').text(currentCount + 1);
+                    
+                    // Show success message
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success('Product added to cart successfully!');
+                    }
+                    
+                    // Reset button after 2 seconds
+                    setTimeout(function() {
+                        $btn.html(originalText).removeClass('btn-success processing').addClass('btn-primary');
+                    }, 2000);
+                } else {
+                    $btn.removeClass('loading processing').html(originalText);
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Failed to add product to cart');
+                    } else {
+                        alert('Failed to add product to cart');
+                    }
+                }
+            },
+            error: function() {
+                $btn.removeClass('loading processing').html(originalText);
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('An error occurred. Please try again.');
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
+            }
+        });
+        
+        return false;
     });
     
     // Wishlist Toggle

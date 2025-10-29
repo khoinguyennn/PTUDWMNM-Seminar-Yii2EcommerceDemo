@@ -17,7 +17,7 @@ class AppAsset extends AssetBundle
         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css',
     ];
     public $js = [
-        'build/app.js',
+        // 'build/app.js', // Disabled to prevent double add-to-cart events
         'js/custom.js',
     ];
     public $depends = [
