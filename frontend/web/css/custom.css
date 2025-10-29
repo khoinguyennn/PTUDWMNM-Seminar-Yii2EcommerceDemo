@@ -24,20 +24,39 @@ body {
     background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
     border-radius: 15px !important;
     box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
+    padding: 60px 40px; /* Thêm padding để tạo khoảng cách từ mép */
 }
 
 .hero-section .opacity-75 {
     opacity: 0.75;
 }
 
+.hero-section .col-md-4 {
+    text-align: center; /* Giữ icon bên phải căn giữa */
+}
+
+.hero-section h1, .hero-section .lead {
+    text-align: left; /* Căn trái cho text chính */
+    margin-left: 20px; /* Thêm margin-left để tạo khoảng cách */
+}
+
+.hero-section h1 {
+    font-size: 2.5rem; /* Giảm kích thước từ display-4 mặc định */
+}
+
+.hero-section .btn {
+    margin-left: 20px; /* Thêm margin cho button cũng căn đều */
+}
+
 /* Navigation */
 .navbar-brand {
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.7rem; /* Tăng từ 1.5rem lên 1.7rem */
 }
 
 .nav-link {
     font-weight: 500;
+    font-size: 1.1rem; /* Thêm font-size cho nav-link */
     transition: all 0.3s ease;
 }
 
@@ -47,6 +66,8 @@ body {
 
 .cart-nav-item .badge {
     animation: pulse 2s infinite;
+    font-size: 0.9rem; /* Thêm font-size cho badge */
+    padding: 0.4em 0.6em; /* Tăng padding cho badge to hơn */
 }
 
 @keyframes pulse {
@@ -69,16 +90,19 @@ body {
 }
 
 .img-wrapper {
-    height: 250px;
+    height: 280px; /* Tăng chiều cao cho sản phẩm điện thoại */
     overflow: hidden;
     position: relative;
+    border-radius: 8px 8px 0 0;
 }
 
 .img-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain; /* Thay đổi từ cover sang contain để hiển thị toàn bộ sản phẩm */
+    object-position: center;
     transition: transform 0.3s ease;
+    background-color: #f8f9fa; /* Nền nhẹ cho sản phẩm */
 }
 
 .product-card:hover .img-wrapper img {
@@ -91,12 +115,21 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
+    min-height: 280px; /* Khớp với chiều cao img-wrapper */
+    border-radius: 8px 8px 0 0;
+}
+
+.product-overlay .btn {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .product-card:hover .product-overlay {
@@ -116,6 +149,12 @@ body {
 .price {
     font-weight: bold;
     font-size: 1.25rem;
+}
+
+.price .currency {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-left: 2px;
 }
 
 .stars i {
@@ -202,12 +241,41 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.5rem; /* Giảm một chút trên mobile */
+    }
+    
+    .nav-link {
+        font-size: 1rem; /* Giảm font size trên mobile */
+    }
+    
+    .hero-section {
+        padding: 40px 20px; /* Giảm padding trên mobile */
+    }
+    
     .hero-section .display-4 {
-        font-size: 2rem;
+        font-size: 1.8rem; /* Giảm kích thước trên mobile */
+    }
+    
+    .hero-section h1 {
+        font-size: 1.8rem; /* Đảm bảo h1 cũng nhỏ trên mobile */
     }
     
     .hero-section .col-md-4 {
         display: none;
+    }
+    
+    .hero-section h1, .hero-section .lead {
+        text-align: center; /* Trên mobile vẫn căn giữa cho đẹp */
+        margin-left: 0; /* Bỏ margin-left trên mobile */
+    }
+    
+    .hero-section .btn {
+        margin-left: 0; /* Bỏ margin-left cho button trên mobile */
+    }
+    
+    .footer h5, .footer h6 {
+        font-size: 1.2rem; /* Giảm một chút cho mobile */
     }
     
     .product-card {
@@ -277,12 +345,13 @@ body {
 .footer h5, .footer h6 {
     color: #ffffff !important;
     font-weight: 600;
+    font-size: 1.3rem; /* Tăng font size cho headers */
     margin-bottom: 1rem;
 }
 
 .footer .text-muted {
     color: #adb5bd !important;
-    font-size: 0.9rem;
+    font-size: 1rem; /* Tăng từ 0.9rem lên 1rem */
 }
 
 .footer .social-links a {
@@ -304,7 +373,7 @@ body {
     color: #adb5bd !important;
     text-decoration: none;
     transition: all 0.3s ease;
-    font-size: 0.9rem;
+    font-size: 1rem; /* Tăng từ 0.9rem lên 1rem */
 }
 
 .footer ul li a:hover {
@@ -318,4 +387,8 @@ body {
 
 .footer .text-primary:hover {
     color: #0056b3 !important;
+}
+
+footer.footer.text-white.mt-5 {
+    height: auto;
 }

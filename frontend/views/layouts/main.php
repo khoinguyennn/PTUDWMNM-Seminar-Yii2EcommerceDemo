@@ -60,7 +60,6 @@ AppAsset::register($this);
     ]);
     $menuItems = [
         ['label' => '<i class="fas fa-home"></i> Home', 'url' => ['/site/index'], 'encode' => false],
-        ['label' => '<i class="fas fa-box"></i> Products', 'url' => ['/site/index'], 'encode' => false],
         [
             'label' => '<i class="fas fa-shopping-cart"></i> Cart <span id="cart-quantity" class="badge badge-warning ml-1">' . $cartItemCount . '</span>',
             'url' => ['/cart/index'],

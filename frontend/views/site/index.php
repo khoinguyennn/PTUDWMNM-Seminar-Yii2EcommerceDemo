@@ -8,7 +8,7 @@ $this->title = 'Welcome to ' . Yii::$app->name;
 <div class="site-index">
     
     <!-- Hero Section -->
-    <div class="hero-section bg-primary text-white text-center py-5 mb-5 rounded">
+    <div class="hero-section bg-primary text-white py-5 mb-5 rounded">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">

@@ -31,7 +31,7 @@
         <div class="price-section mb-2">
             <h5 class="price text-primary mb-0">
                 <i class="fas fa-tag"></i>
-                <?php echo Yii::$app->formatter->asCurrency($model->price) ?>
+                <?= Yii::$app->formatter->asCurrency($model->price) ?>
             </h5>
         </div>
         
