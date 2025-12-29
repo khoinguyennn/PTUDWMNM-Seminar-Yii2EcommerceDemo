@@ -146,7 +146,8 @@ class Product extends \yii\db\ActiveRecord
         $ok = parent::save($runValidation, $attributeNames);
 
         if ($ok && $this->imageFile) {
-            $fullPath = Yii::getAlias('@frontend/web/storage' . $this->image);
+            // Lưu vào thư mục uploads ở root project
+            $fullPath = Yii::getAlias('@app/../uploads' . $this->image);
             $dir = dirname($fullPath);
             if (!FileHelper::createDirectory($dir) | !$this->imageFile->saveAs($fullPath)) {
                 $transaction->rollBack();
@@ -168,10 +169,24 @@ class Product extends \yii\db\ActiveRecord
     public static function formatImageUrl($imagePath)
     {
         if ($imagePath) {
-            return Yii::$app->params['frontendUrl'] . '/storage' . $imagePath;
+            // Loại bỏ dấu / ở đầu nếu có
+            $imagePath = ltrim($imagePath, '/');
+            
+            // Đường dẫn tuyệt đối để kiểm tra file tồn tại
+            $absolutePath = Yii::getAlias('@app/../uploads/' . $imagePath);
+            
+            // Debug log
+            Yii::info("Checking image at: {$absolutePath}", 'image-debug');
+            
+            // Nếu file tồn tại
+            if (file_exists($absolutePath)) {
+                // Trả về đường dẫn từ frontend/web/uploads (cần tạo symlink)
+                return '/uploads/' . $imagePath;
+            }
         }
 
-        return Yii::$app->params['frontendUrl'] . '/img/no_image_available.png';
+        // Ảnh mặc định SVG
+        return '/images/no-image.svg';
     }
 
     /**
