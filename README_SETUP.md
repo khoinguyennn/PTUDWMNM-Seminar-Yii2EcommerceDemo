@@ -249,29 +249,393 @@ php -S localhost:8080 -t frontend/web frontend/web/router.php
 php -S localhost:8080 -t frontend/web
 ```
 
-## 📂 Cấu Trúc Thư Mục Quan Trọng
+## 📂 Cấu Trúc Thư Mục Chi Tiết
+
+### 📁 Thư Mục Gốc
 
 ```
 yii2-ecommerce-website/
-├── frontend/           # Frontend (Khách hàng)
-│   ├── web/
-│   │   ├── uploads/   # Symlink → ../../uploads
-│   │   ├── images/    # Chứa no-image.svg
-│   │   └── router.php # Router cho PHP built-in server
-│   └── ...
-├── backend/            # Backend (Quản trị)
-│   ├── web/
-│   │   ├── uploads/   # Symlink → ../../uploads
-│   │   ├── images/    # Chứa no-image.svg
-│   │   └── router.php # Router cho PHP built-in server
-│   └── ...
-├── common/             # Code dùng chung
-│   ├── models/        # Models
-│   └── config/        # Config files
-├── uploads/            # Thư mục lưu ảnh upload (gốc)
-│   └── products/      # Ảnh sản phẩm
-└── console/            # Console commands
-    └── migrations/    # Database migrations
+├── frontend/              # Application Frontend (Trang khách hàng)
+├── backend/               # Application Backend (Trang quản trị)
+├── common/                # Code dùng chung giữa frontend và backend
+├── console/               # Console application (CLI commands)
+├── environments/          # Environment configurations (dev/prod)
+├── uploads/               # Thư mục lưu trữ file upload
+├── vendor/                # Thư viện PHP từ Composer
+├── vagrant/               # Vagrant configuration (nếu dùng)
+├── composer.json          # Composer dependencies
+├── composer.lock          # Composer lock file
+├── init                   # Script khởi tạo môi trường (Linux/Mac)
+├── init.bat               # Script khởi tạo môi trường (Windows)
+├── yii                    # Yii console command (Linux/Mac)
+├── yii.bat                # Yii console command (Windows)
+├── README.md              # Thông tin dự án
+└── README_SETUP.md        # Hướng dẫn setup dự án
+```
+
+---
+
+### 🎨 Frontend (Trang Khách Hàng)
+
+**Đường dẫn**: `frontend/`
+
+Đây là phần giao diện dành cho khách hàng truy cập.
+
+```
+frontend/
+├── assets/               # Asset bundles (CSS, JS)
+│   └── AppAsset.php     # Đăng ký CSS/JS cho frontend
+├── config/              # Cấu hình frontend
+│   ├── main.php         # Cấu hình chính
+│   ├── main-local.php   # Cấu hình local (database, etc.)
+│   ├── params.php       # Parameters
+│   └── bootstrap.php    # Bootstrap configuration
+├── controllers/         # Controllers xử lý request
+│   ├── SiteController.php      # Trang chủ, login, signup
+│   ├── CartController.php      # Giỏ hàng
+│   ├── OrderController.php     # Đơn hàng
+│   └── ProductController.php   # Chi tiết sản phẩm
+├── models/              # Models cho frontend
+│   ├── LoginForm.php           # Form đăng nhập
+│   ├── SignupForm.php          # Form đăng ký
+│   ├── ContactForm.php         # Form liên hệ
+│   └── search/                 # Search models
+├── views/               # Views (HTML templates)
+│   ├── layouts/                # Layout chung
+│   │   └── main.php           # Layout chính (navbar, footer)
+│   ├── site/                   # Views cho SiteController
+│   │   ├── index.php          # Trang chủ
+│   │   ├── login.php          # Trang đăng nhập
+│   │   ├── signup.php         # Trang đăng ký
+│   │   └── _product_item.php  # Template card sản phẩm
+│   ├── cart/                   # Views cho CartController
+│   ├── order/                  # Views cho OrderController
+│   └── product/                # Views cho ProductController
+├── web/                 # Web root (public folder)
+│   ├── index.php               # Entry point
+│   ├── router.php              # Router cho PHP built-in server
+│   ├── uploads/                # Symlink → ../../uploads
+│   ├── images/                 # Ảnh static
+│   │   └── no-image.svg       # Placeholder khi không có ảnh
+│   ├── css/                    # CSS files
+│   │   └── custom.css         # Custom CSS (360+ dòng)
+│   ├── js/                     # JavaScript files
+│   │   └── custom.js          # Custom JS (AJAX cart)
+│   └── assets/                 # Generated assets
+├── runtime/             # Runtime files (cache, logs)
+│   ├── cache/                  # Cache files
+│   └── logs/                   # Log files
+└── tests/               # Tests cho frontend
+```
+
+**Chức năng chính**:
+- Hiển thị danh sách sản phẩm
+- Xem chi tiết sản phẩm
+- Thêm sản phẩm vào giỏ hàng (AJAX)
+- Quản lý giỏ hàng
+- Đặt hàng và thanh toán
+- Đăng ký/Đăng nhập khách hàng
+
+---
+
+### 🔧 Backend (Trang Quản Trị)
+
+**Đường dẫn**: `backend/`
+
+Đây là phần giao diện dành cho admin quản lý hệ thống.
+
+```
+backend/
+├── assets/              # Asset bundles
+│   └── AppAsset.php    # Đăng ký CSS/JS cho backend
+├── config/              # Cấu hình backend
+│   ├── main.php        # Cấu hình chính
+│   ├── main-local.php  # Cấu hình local
+│   ├── params.php      # Parameters
+│   └── bootstrap.php   # Bootstrap configuration
+├── controllers/         # Controllers xử lý request
+│   ├── SiteController.php      # Dashboard, login
+│   ├── ProductController.php   # CRUD sản phẩm
+│   ├── OrderController.php     # Quản lý đơn hàng
+│   └── UserController.php      # Quản lý user (nếu có)
+├── models/              # Models cho backend
+│   ├── LoginForm.php           # Form đăng nhập admin
+│   └── search/                 # Search models
+│       ├── ProductSearch.php   # Search sản phẩm
+│       └── OrderSearch.php     # Search đơn hàng
+├── views/               # Views (HTML templates)
+│   ├── layouts/                # Layout chung
+│   │   └── main.php           # Layout chính
+│   ├── site/                   # Views cho SiteController
+│   │   ├── index.php          # Dashboard
+│   │   └── login.php          # Trang đăng nhập admin
+│   ├── product/                # Views cho ProductController
+│   │   ├── index.php          # Danh sách sản phẩm
+│   │   ├── create.php         # Tạo sản phẩm
+│   │   ├── update.php         # Sửa sản phẩm
+│   │   ├── view.php           # Xem chi tiết
+│   │   └── _form.php          # Form tạo/sửa
+│   └── order/                  # Views cho OrderController
+│       ├── index.php          # Danh sách đơn hàng
+│       ├── view.php           # Xem chi tiết đơn
+│       └── update.php         # Cập nhật trạng thái
+├── web/                 # Web root (public folder)
+│   ├── index.php               # Entry point
+│   ├── router.php              # Router cho PHP built-in server
+│   ├── uploads/                # Symlink → ../../uploads
+│   ├── images/                 # Ảnh static
+│   │   └── no-image.svg       # Placeholder
+│   ├── css/                    # CSS files
+│   └── assets/                 # Generated assets
+├── runtime/             # Runtime files
+│   ├── cache/                  # Cache files
+│   └── logs/                   # Log files
+└── tests/               # Tests cho backend
+```
+
+**Chức năng chính**:
+- Đăng nhập admin
+- Quản lý sản phẩm (CRUD - Create, Read, Update, Delete)
+- Upload ảnh sản phẩm
+- Quản lý đơn hàng
+- Cập nhật trạng thái đơn hàng
+- Xem báo cáo, thống kê
+
+---
+
+### 🔗 Common (Code Dùng Chung)
+
+**Đường dẫn**: `common/`
+
+Chứa code được chia sẻ giữa frontend và backend.
+
+```
+common/
+├── config/              # Cấu hình chung
+│   ├── main.php                # Cấu hình chính (components, modules)
+│   ├── main-local.php          # Cấu hình local (database)
+│   ├── params.php              # Parameters chung
+│   └── bootstrap.php           # Bootstrap configuration
+├── models/              # Models chung
+│   ├── User.php                # Model User (admin, customer)
+│   ├── Product.php             # Model Product
+│   ├── Order.php               # Model Order
+│   ├── OrderItem.php           # Model Order Item (chi tiết đơn)
+│   ├── CartItem.php            # Model Cart Item (giỏ hàng)
+│   └── query/                  # Active Query classes
+│       ├── UserQuery.php
+│       ├── ProductQuery.php
+│       └── OrderQuery.php
+├── components/          # Components tùy chỉnh
+│   └── Formatter.php           # Custom formatter (currency)
+├── i18n/                # Internationalization
+│   └── Formatter.php           # I18n formatter
+├── grid/                # Grid widgets
+│   └── ActionColumn.php        # Custom action column
+├── widgets/             # Widgets tùy chỉnh
+├── mail/                # Email templates
+│   ├── emailVerify-html.php    # Email xác thực HTML
+│   ├── emailVerify-text.php    # Email xác thực Text
+│   ├── order_completed_customer-html.php
+│   └── order_completed_customer-text.php
+├── fixtures/            # Data fixtures cho testing
+│   └── UserFixture.php
+└── tests/               # Tests chung
+```
+
+**Mục đích**:
+- Tránh duplicate code
+- Models được dùng bởi cả frontend và backend
+- Components, widgets dùng chung
+- Email templates
+- Cấu hình database chung
+
+---
+
+### 💻 Console (CLI Application)
+
+**Đường dẫn**: `console/`
+
+Chứa các console commands để chạy từ terminal.
+
+```
+console/
+├── config/              # Cấu hình console
+│   ├── main.php                # Cấu hình chính
+│   ├── main-local.php          # Cấu hình local
+│   ├── params.php              # Parameters
+│   └── bootstrap.php           # Bootstrap configuration
+├── controllers/         # Console controllers
+│   ├── AppController.php       # Custom app commands
+│   │                           # (tạo admin user, etc.)
+│   └── MigrateController.php   # Migration commands (nếu override)
+├── migrations/          # Database migrations
+│   ├── m130524_201442_init.php                    # Tạo bảng user
+│   ├── m190124_110200_add_verification_token_column_to_user_table.php
+│   ├── m241229_025726_create_products_table.php   # Tạo bảng products
+│   ├── m241229_025738_create_cart_items_table.php # Tạo bảng cart_items
+│   ├── m241229_025800_create_orders_table.php     # Tạo bảng orders
+│   └── m241229_025811_create_order_items_table.php# Tạo bảng order_items
+├── models/              # Models cho console
+└── runtime/             # Runtime files
+    ├── cache/
+    └── logs/
+```
+
+**Các lệnh console**:
+```bash
+# Chạy migrations
+php yii migrate
+
+# Reset database (xóa tất cả và chạy lại migrations)
+php yii migrate/fresh
+
+# Tạo admin user
+php yii app/create-admin-user <username> <password>
+
+# Clear cache
+php yii cache/flush-all
+```
+
+---
+
+### 🌍 Environments (Môi Trường)
+
+**Đường dẫn**: `environments/`
+
+Chứa cấu hình cho các môi trường khác nhau.
+
+```
+environments/
+├── index.php            # Danh sách environments
+├── dev/                 # Development environment
+│   ├── common/
+│   │   └── config/
+│   │       └── main-local.php      # DB config cho dev
+│   ├── frontend/
+│   │   └── config/
+│   │       └── main-local.php      # Frontend config cho dev
+│   └── backend/
+│       └── config/
+│           └── main-local.php      # Backend config cho dev
+└── prod/                # Production environment
+    ├── common/
+    ├── frontend/
+    └── backend/
+```
+
+**Cách sử dụng**:
+```bash
+# Khởi tạo môi trường development
+php init
+
+# Chọn [0] Development
+```
+
+---
+
+### 📤 Uploads (Thư Mục Upload)
+
+**Đường dẫn**: `uploads/`
+
+Thư mục lưu trữ tất cả file upload (ảnh sản phẩm, v.v.)
+
+```
+uploads/
+└── products/            # Ảnh sản phẩm
+    └── [random-string]/ # Thư mục ngẫu nhiên cho mỗi ảnh
+        └── product.jpg  # File ảnh
+```
+
+**Lưu ý**:
+- Thư mục này được symlink vào `frontend/web/uploads` và `backend/web/uploads`
+- Ảnh được tổ chức theo cấu trúc `/products/[random-string]/[filename]`
+- Random string để tránh trùng lặp tên file
+
+---
+
+### 📦 Vendor (Thư Viện PHP)
+
+**Đường dẫn**: `vendor/`
+
+Chứa tất cả thư viện PHP được cài qua Composer.
+
+```
+vendor/
+├── autoload.php         # Composer autoloader
+├── yiisoft/             # Yii2 framework
+│   ├── yii2/           # Yii2 core
+│   └── yii2-bootstrap4/# Bootstrap 4 extension
+├── swiftmailer/         # Email library
+├── phpunit/             # Testing framework
+├── codeception/         # Testing framework
+└── ...                  # Các thư viện khác
+```
+
+**Không commit thư mục này** vào Git (đã có trong `.gitignore`)
+
+---
+
+### 📋 Files Quan Trọng Ở Thư Mục Gốc
+
+```
+├── composer.json        # Danh sách dependencies
+├── composer.lock        # Lock file (version cụ thể)
+├── init                 # Script khởi tạo env (Linux/Mac)
+├── init.bat             # Script khởi tạo env (Windows)
+├── yii                  # Yii console (Linux/Mac)
+├── yii.bat              # Yii console (Windows)
+├── requirements.php     # Kiểm tra requirements
+├── LICENSE.md           # License
+├── README.md            # Thông tin dự án
+└── README_SETUP.md      # Hướng dẫn setup (file này)
+```
+
+---
+
+## 🔄 Luồng Hoạt Động
+
+### Frontend (Customer):
+1. User truy cập `http://localhost:8080`
+2. Request đi qua `frontend/web/index.php`
+3. Router xử lý URL → Controller → Action
+4. Controller lấy data từ Model (trong `common/models/`)
+5. Controller render View (trong `frontend/views/`)
+6. Response trả về HTML cho user
+
+### Backend (Admin):
+1. Admin truy cập `http://localhost:8081`
+2. Request đi qua `backend/web/index.php`
+3. Router xử lý URL → Controller → Action
+4. Controller lấy/lưu data từ Model (trong `common/models/`)
+5. Controller render View (trong `backend/views/`)
+6. Response trả về HTML cho admin
+
+### Upload Ảnh:
+1. Admin upload ảnh qua backend form
+2. `ProductController` xử lý upload
+3. `Product` model lưu file vào `uploads/products/[random]/[file]`
+4. Đường dẫn lưu vào database: `/products/[random]/[file]`
+5. Frontend/Backend truy cập ảnh qua symlink `web/uploads/`
+
+---
+
+## 🗄️ Database Schema
+
+### Tables:
+- **user** - Lưu thông tin user (admin, customer)
+- **products** - Lưu thông tin sản phẩm
+- **cart_items** - Lưu giỏ hàng (cho user đã login)
+- **orders** - Lưu thông tin đơn hàng
+- **order_items** - Lưu chi tiết đơn hàng (sản phẩm trong đơn)
+
+### Relationships:
+```
+User (1) -----> (N) Orders
+Product (1) --> (N) CartItems
+Product (1) --> (N) OrderItems  
+Order (1) ----> (N) OrderItems
+User (1) -----> (N) CartItems
 ```
 
 ## 🔐 Thông Tin Tài Khoản Mẫu
